@@ -1,0 +1,25 @@
+name: Test Action
+
+description: |
+  Test Action description.
+
+inputs:
+  input1:
+    description: 'input1 description.'
+    required: true
+  input2:
+    description: 'input2 description.'
+    required: false
+    default: 'default value'
+
+outputs:
+  output1:
+    description: 'output1 description.'
+    value: 'Hello, World!'
+
+runs:
+  using: composite
+  steps:
+    - name: Step 1
+      run: echo "Hello, World!"
+      shell: bash

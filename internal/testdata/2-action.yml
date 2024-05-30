@@ -1,0 +1,31 @@
+name: Test Action 2
+
+author: reakaleek
+
+branding:
+  icon: 'package'
+  color: 'blue'
+
+description: |
+  Test Action 2 description.
+
+inputs:
+  input1:
+    description: 'input1 description. new'
+    required: true
+  input2:
+    description: 'input2 description. new'
+    required: false
+    default: 'default value'
+
+outputs:
+  output1:
+    description: 'output1 description. new'
+    value: 'Hello, World!'
+
+runs:
+  using: composite
+  steps:
+    - name: Step 1
+      run: echo "Hello, World!"
+      shell: bash
