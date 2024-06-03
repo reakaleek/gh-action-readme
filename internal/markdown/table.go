@@ -20,7 +20,7 @@ func attachHeader(sb *strings.Builder, matrix [][]string, colWidths []int) {
 		sb.WriteString("| " + col + strings.Repeat(" ", colWidths[i]-len(col)+1)) // +1 for the leading space
 	}
 	sb.WriteString("|\n")
-	for i, _ := range matrix[0] {
+	for i := range matrix[0] {
 		sb.WriteString("|" + strings.Repeat("-", colWidths[i]+2)) // +2 for the spaces
 	}
 	sb.WriteString("|\n")

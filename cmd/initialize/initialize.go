@@ -41,6 +41,9 @@ func initRun(template string, readmePath string) error {
 			return err
 		}
 		err = writeToFile(readmePath, string(file))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
