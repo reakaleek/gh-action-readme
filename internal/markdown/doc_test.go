@@ -173,9 +173,10 @@ func TestUpdateUsage(t *testing.T) {
 	}
 
 	// act
-	doc.UpdateUsage(nil)
+	err := doc.UpdateUsage(nil)
 
 	// assert
+	assert.NoError(t, err)
 	assert.Equal(t, "<!-- usage action=\"elastic/oblt-actions/test\" version=\"env:VERSION\" -->\n```yaml\n    uses: elastic/oblt-actions/test@v2\n```\n<!--/usage-->", doc.ToString())
 }
 
