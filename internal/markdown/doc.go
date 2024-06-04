@@ -169,6 +169,10 @@ func (d *Doc) clearSection(name string) {
 	d.removeLines(startIndex+1, endIndex+1)
 }
 
+func (d *Doc) GetName() string {
+	return d.name
+}
+
 func (d *Doc) Diff(doc *Doc) DiffResult {
 	dmp := diffmatchpatch.New()
 	diffs := dmp.DiffMain(d.ToString(), doc.ToString(), false)
@@ -239,4 +243,8 @@ func getAttribute(line string, attribute string) (string, error) {
 		return matches[1], nil
 	}
 	return "", fmt.Errorf("failed to get attribute %s", attribute)
+}
+
+func (d *Doc) Equals(doc Doc) bool {
+	return d.ToString() == doc.ToString()
 }

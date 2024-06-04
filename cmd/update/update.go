@@ -40,14 +40,20 @@ func updateRun(actionPath string, readmePath string) error {
 	if err != nil {
 		return err
 	}
+	oldDoc := doc.Copy()
 	err = doc.Update(&a)
 	if err != nil {
 		return err
 	}
+
+	if doc.Equals(oldDoc) {
+		return nil
+	}
+
 	err = doc.WriteToFile()
 	if err != nil {
 		return err
 	}
-	println("Successfully updated README.md")
+	println(doc.GetName())
 	return nil
 }
