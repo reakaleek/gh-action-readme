@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/reakaleek/gh-action-readme/cmd/diff"
 	"github.com/reakaleek/gh-action-readme/cmd/initialize"
+	"github.com/reakaleek/gh-action-readme/cmd/precommit"
 	"github.com/reakaleek/gh-action-readme/cmd/update"
 	"github.com/urfave/cli/v2"
 	"log"
@@ -17,6 +18,7 @@ func Execute() {
 			diff.NewCommand(),
 			update.NewCommand(),
 			initialize.NewCommand(),
+			precommit.NewCommand(),
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
