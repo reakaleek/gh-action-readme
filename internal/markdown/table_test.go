@@ -60,3 +60,25 @@ func TestEmpty(t *testing.T) {
 	assert.Equal(t, "", md)
 
 }
+
+func TestMultilineString(t *testing.T) {
+	// arrange
+	matrix := [][]string{
+		{"Name", "Description", "Required", "Default"},
+		{"`i1`", "d1\nmultiline", "`true`", "` `"},
+		{"`i2`", "d2", "`false`", "` `"},
+	}
+
+	// act
+	md := table(matrix)
+
+	// assert
+	assert.Equal(
+		t,
+		"| Name | Description     | Required | Default |\n"+
+			"|------|-----------------|----------|---------|\n"+
+			"| `i1` | d1<br>multiline | `true`   | ` `     |\n"+
+			"| `i2` | d2              | `false`  | ` `     |\n",
+		md,
+	)
+}
