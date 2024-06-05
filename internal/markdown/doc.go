@@ -1,6 +1,7 @@
 package markdown
 
 import (
+	"errors"
 	"fmt"
 	"github.com/reakaleek/gh-action-readme/internal/action"
 	"github.com/sergi/go-diff/diffmatchpatch"
@@ -24,6 +25,38 @@ type Doc struct {
 
 func NewDoc(name string) (*Doc, error) {
 	content, err := readFile(name)
+	if errors.Is(err, os.ErrNotExist) {
+		f, err := os.Create(name)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		newDoc := &Doc{
+			name: name,
+			lines: []string{
+				"# <!--name--><!--/name-->",
+				"<!--description-->",
+				"## Inputs",
+				"<!--inputs-->",
+				"## Outputs",
+				"<!--outputs-->",
+				"## Usage",
+				"<!--usage action=\"your/action\" version=\"v1\"-->",
+				"```yaml",
+				"on: push",
+				"steps:",
+				"  - uses: your/action@v1",
+				"```",
+				"<!--/usage-->",
+			},
+		}
+		err = newDoc.WriteToFile()
+		if err != nil {
+			return nil, err
+		}
+		return newDoc, nil
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}

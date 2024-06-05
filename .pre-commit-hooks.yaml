@@ -1,0 +1,6 @@
+- id: action-readme
+  name: 'Action Readme'
+  description: 'Generate a README.md for the action'
+  language: golang
+  entry: gh-action-readme pre-commit
+  files: (action.ya?ml|README.md)$
