@@ -1,5 +1,5 @@
 - id: action-readme
-  name: 'Action Readme'
+  name: action-readme
   description: 'Generate a README.md for the action'
   language: golang
   entry: gh-action-readme pre-commit
