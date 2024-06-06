@@ -4,7 +4,9 @@
 ![GitHub Release](https://img.shields.io/github/v/release/reakaleek/gh-action-readme?logo=github)
 ![GitHub Release Date](https://img.shields.io/github/release-date/reakaleek/gh-action-readme?display_date=published_at&logo=github)
 
-![gh action-readme](./carbon.svg)
+<p align="center">
+  <img width="460" height="300" src="./carbon.svg">
+</p>
 
 A GitHub CLI extension to inject GitHub Actions metadata into README.md markdown files.
 
