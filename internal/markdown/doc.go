@@ -243,11 +243,11 @@ func (d *Doc) UpdateUsage(a *action.Action) error {
 	if err != nil {
 		return err
 	}
-	versionedActionRe := regexp.MustCompile("uses:\\s*(\\S+)@\\S+")
+	versionedActionRe := regexp.MustCompile(`uses:\s*(\S+)@\S+`)
 	if usageEndIndex > 0 && usageEndIndex > usageIndex {
 		for i := usageIndex; i < usageEndIndex; i += 1 {
 			submatch := versionedActionRe.FindStringSubmatch(d.lines[i])
-			if len(submatch) >= 2 {
+			if len(submatch) == 2 {
 				actionName := submatch[1]
 				globMatch, _ := doublestar.Match(actionGlob, actionName)
 				if globMatch {
