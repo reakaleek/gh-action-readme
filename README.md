@@ -1,14 +1,59 @@
+
 # gh-action-readme
+
+![GitHub Release](https://img.shields.io/github/v/release/reakaleek/gh-action-readme?logo=github)
+![GitHub Release Date](https://img.shields.io/github/release-date/reakaleek/gh-action-readme?display_date=published_at&logo=github)
+
+![gh action-readme](./carbon.svg)
 
 A GitHub CLI extension to inject GitHub Actions metadata into README.md markdown files.
 
-## Install
+## Prerequisites
+- [GitHub CLI](https://cli.github.com/)
+
+## ⚡️ Quick Start
+
+### Install the `gh-action-readme` extension
 
 ```bash
 gh extension install reakaleek/gh-action-readme
 ```
 
-## Quick Start
+## Create a `README.md` file
+
+```markdown
+# <!--name--><!--/name-->
+<!--description-->
+
+## Inputs
+<!--inputs-->
+
+## Outputs
+```
+
+### Update the `README.md` file
+
+Go to the action directory containing the `action.yml` file and run the following command:
+
+```bash
+gh action-readme update
+```
+
+### That's it! 🎉
+
+The `README.md` file will be updated with the metadata from the `action.yml` file.
+
+## 💡 How it works
+
+
+<!--
+
+Hello
+-----
+
+
+
+```markdown
 
 ### action.yml
 
@@ -104,4 +149,3 @@ steps:
      input2: value2
 ```
 ````
-
