@@ -3,6 +3,7 @@ package markdown
 import (
 	"errors"
 	"fmt"
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/reakaleek/gh-action-readme/internal/action"
 	"github.com/sergi/go-diff/diffmatchpatch"
 	"os"
@@ -237,21 +238,34 @@ func (d *Doc) UpdateUsage(a *action.Action) error {
 	if err != nil {
 		return err
 	}
-	actionName, err := getAttribute(d.lines[usageIndex], "action")
+	actionGlob, err := getAttribute(d.lines[usageIndex], "action")
 	if err != nil {
 		return err
 	}
-	actionName, err = parseEnvVariable(actionName)
-	if err != nil {
-		return err
-	}
+	versionedActionRe := regexp.MustCompile("uses:\\s*(\\S+)@\\S+")
 	if usageEndIndex > 0 {
-		pattern := strings.ReplaceAll(fmt.Sprintf("%s@\\S+", actionName), "/", "\\/")
-		re := regexp.MustCompile(pattern)
+
 		for i := usageIndex; i < usageEndIndex; i += 1 {
-			actionWithVersion := fmt.Sprintf("%s@%s", actionName, version)
-			d.lines[i] = re.ReplaceAllString(d.lines[i], actionWithVersion)
+			submatch := versionedActionRe.FindStringSubmatch(d.lines[i])
+			if len(submatch) >= 2 {
+				actionName := submatch[1]
+				globMatch, _ := doublestar.Match(actionGlob, actionName)
+
+				if globMatch {
+					pattern := strings.ReplaceAll(fmt.Sprintf("%s@\\S+", actionName), "/", "\\/")
+					re := regexp.MustCompile(pattern)
+					d.lines[i] = re.ReplaceAllString(d.lines[i], fmt.Sprintf("%s@%s", actionName, version))
+				}
+
+			}
 		}
+
+		//pattern := strings.ReplaceAll(fmt.Sprintf("%s@\\S+", actionGlob), "/", "\\/")
+		//re := regexp.MustCompile(pattern)
+		//for i := usageIndex; i < usageEndIndex; i += 1 {
+		//	actionWithVersion := fmt.Sprintf("%s@%s", actionGlob, version)
+		//	d.lines[i] = re.ReplaceAllString(d.lines[i], actionWithVersion)
+		//}
 	}
 	return nil
 }

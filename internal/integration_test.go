@@ -34,6 +34,12 @@ func Test(t *testing.T) {
 			"testdata/3-README-out.md",
 			"v2.0.0",
 		},
+		{
+			"testdata/4-action.yml",
+			"testdata/4-README-in.md",
+			"testdata/4-README-out.md",
+			"v1.0.0",
+		},
 	}
 
 	for _, tt := range tests {

@@ -1,0 +1,11 @@
+name: Test Action
+
+description: |
+  Test Action description.
+
+runs:
+  using: composite
+  steps:
+    - name: Step 1
+      run: echo "Hello, World!"
+      shell: bash
