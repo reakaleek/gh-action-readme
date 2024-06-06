@@ -89,118 +89,22 @@ pre-commit install
 > You can use the [pre-commit action](https://github.com/marketplace/actions/pre-commit) to run the pre-commit checks in your GitHub Actions workflow.
 
 
-## GitHub Actions Monorepo support
+## GitHub Actions Monorepo Support
 
 The `gh-action-readme` extension supports monorepos with multiple actions in a single repository.
 It will automatically detect the `action.yml` files in the repository and update the corresponding `README.md` files.
 
-
-```bash
-
-## Templating
-
-
-
-<!--
-
-Hello
------
-
-
-
-```markdown
-
-### action.yml
-
-Given an action.yml file:
-
-```yaml
-name: The Action
-description: |
-  An action that does something.
-  It's a very useful action.
-
-inputs:
-  input1:
-    description: The first input
-    required: true
-  input2:
-    description: The second input
-    required: false
-    default: 'default'
-
-outputs:
-  output1:
-    description: The first output
-
-runs:
-  # ...
 ```
-
-### README.md
-
-And a README.md file:
-
-````diff
-# <!--name--><!--/name-->
-<!--description-->
-
-## Inputs
-<!--inputs-->
-
-## Outputs
-<!--outputs-->
-
-## Usage
-<!--usage action="org/repo" version="v1"-->
-```yaml
-steps:
- - uses: org/repo@main
-   with:
-     input1: value1
-     input2: value2
+.
+├── action-a/
+│   ├── action.yml
+│   └── README.md
+├── action-b/
+│   ├── action.yml
+│   └── README.md
+└── some/
+    └── folder/
+        └── action-c/
+            ├── action.yml
+            └── README.md
 ```
-````
-
-### Update Command
-
-```bash
-gh action-readme update
-```
-
-### Diff
-
-````diff
--# <!--name--><!--/name-->
-+# <!--name-->The Action<!--/name-->
-<!--description-->
-+An action that does something.
-+It's a very useful action.
-+<!--/description-->
-
-## Inputs
-<!--inputs-->
-+| Name   | Description      | Required | Default   |
-+|--------|------------------|----------|-----------|
-+| input1 | The first input  | `true`   | ` `       |
-+| input2 | The second input | `false`  | `default` |
-+<!--/inputs-->
-
-## Outputs
-<!--outputs-->
-+| Name    | Description      |
-+|---------|------------------|
-+| output1 | The first output |
-+<!--/outputs-->
-
-## Usage
-<!--usage action="org/repo" version="v1"-->
-```yaml
-steps:
--  - uses: org/repo@main
-+  - uses: org/repo@v1
-   with:
-     input1: value1
-     input2: value2
-```
-````
