@@ -225,11 +225,12 @@ type DiffResult struct {
 func (d *Doc) UpdateUsage(a *action.Action) error {
 	usageIndex := d.findIndex(startCommentPattern("usage"))
 	usageEndIndex := d.findIndex(endCommentPattern("usage"))
-
 	if usageIndex == -1 {
 		return nil
 	}
-
+	if usageEndIndex == -1 {
+		return fmt.Errorf("missing end comment for usage section. add <!--/usage--> to the end of the usage section")
+	}
 	version, err := getAttribute(d.lines[usageIndex], "version")
 	if err != nil {
 		return err
@@ -243,29 +244,19 @@ func (d *Doc) UpdateUsage(a *action.Action) error {
 		return err
 	}
 	versionedActionRe := regexp.MustCompile("uses:\\s*(\\S+)@\\S+")
-	if usageEndIndex > 0 {
-
+	if usageEndIndex > 0 && usageEndIndex > usageIndex {
 		for i := usageIndex; i < usageEndIndex; i += 1 {
 			submatch := versionedActionRe.FindStringSubmatch(d.lines[i])
 			if len(submatch) >= 2 {
 				actionName := submatch[1]
 				globMatch, _ := doublestar.Match(actionGlob, actionName)
-
 				if globMatch {
 					pattern := strings.ReplaceAll(fmt.Sprintf("%s@\\S+", actionName), "/", "\\/")
 					re := regexp.MustCompile(pattern)
 					d.lines[i] = re.ReplaceAllString(d.lines[i], fmt.Sprintf("%s@%s", actionName, version))
 				}
-
 			}
 		}
-
-		//pattern := strings.ReplaceAll(fmt.Sprintf("%s@\\S+", actionGlob), "/", "\\/")
-		//re := regexp.MustCompile(pattern)
-		//for i := usageIndex; i < usageEndIndex; i += 1 {
-		//	actionWithVersion := fmt.Sprintf("%s@%s", actionGlob, version)
-		//	d.lines[i] = re.ReplaceAllString(d.lines[i], actionWithVersion)
-		//}
 	}
 	return nil
 }
