@@ -229,7 +229,7 @@ func (d *Doc) UpdateUsage(a *action.Action) error {
 		return nil
 	}
 	if usageEndIndex == -1 {
-		return fmt.Errorf("missing end comment for usage section. add <!--/usage--> to the end of the usage section")
+		return fmt.Errorf("%s: missing end comment for usage section. add <!--/usage--> to the end of the usage section", a.Name)
 	}
 	version, err := getAttribute(d.lines[usageIndex], "version")
 	if err != nil {
