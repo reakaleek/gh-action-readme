@@ -1,6 +1,7 @@
 name: Test Action
 
-description: 'This is a test action.'
+description: |
+  Test Action description.
 
 inputs:
   input1:
