@@ -89,9 +89,9 @@ pre-commit install
 > You can use the [pre-commit action](https://github.com/marketplace/actions/pre-commit) to run the pre-commit checks in your GitHub Actions workflow.
 
 
-## GitHub Actions Monorepo Support
+### GitHub Actions Monorepo Support
 
-The `gh-action-readme` extension supports monorepos with multiple actions in a single repository.
+The `action-readme` pre-commit supports monorepos with multiple actions in a single repository.
 It will automatically detect the `action.yml` files in the repository and update the corresponding `README.md` files.
 
 ```
