@@ -1,3 +1,4 @@
+<!-- Generated with https://github.com/reakaleek/gh-action-readme -->
 ## Usage
 <!--usage action="org/repo/**/*" version="env:VERSION"-->
 ```yaml
