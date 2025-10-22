@@ -2,12 +2,16 @@ version: 2
 updates:
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
+    labels: 
+      - "changelog:dependencies"
     directory: "/"
     schedule:
       interval: "weekly"
 
   # Enable version updates for Go modules
   - package-ecosystem: "gomod"
+    labels:
+      - "changelog:dependencies"
     directory: "/"
     schedule:
       interval: "weekly"
