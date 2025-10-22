@@ -5,7 +5,7 @@ go 1.21.6
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1
 	github.com/sergi/go-diff v1.3.1
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.2
 	gopkg.in/yaml.v3 v3.0.1
 )
