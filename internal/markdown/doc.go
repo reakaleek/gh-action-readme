@@ -17,6 +17,7 @@ const (
 	inputsSectionName          = "inputs"
 	outputsSectionName         = "outputs"
 	tableOfContentsSectionName = "toc"
+	generatedComment           = "<!-- Generated with https://github.com/reakaleek/gh-action-readme -->"
 )
 
 type Doc struct {
@@ -93,6 +94,7 @@ func (d *Doc) updateOutputs(outputsMatrix [][]string) {
 //}
 
 func (d *Doc) Update(a *action.Action) error {
+	d.ensureGeneratedComment()
 	d.updateName(a.Name)
 	d.updateDescription(a.Description)
 	d.updateInputs(a.GetInputsMatrix())
@@ -114,7 +116,17 @@ func (d *Doc) ToString() string {
 }
 
 func (d *Doc) WriteToFile() error {
+	d.ensureGeneratedComment()
 	return os.WriteFile(d.name, []byte(d.ToString()), 0755)
+}
+
+func (d *Doc) ensureGeneratedComment() {
+	// Check if the comment already exists at the top
+	if len(d.lines) > 0 && d.lines[0] == generatedComment {
+		return
+	}
+	// Prepend the comment
+	d.lines = append([]string{generatedComment}, d.lines...)
 }
 
 func readFile(name string) (string, error) {

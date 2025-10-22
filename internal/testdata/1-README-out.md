@@ -1,3 +1,4 @@
+<!-- Generated with https://github.com/reakaleek/gh-action-readme -->
 # <!--name-->Test Action<!--/ name-->
 <!--description-->Test Action description.<!--/description-->
 

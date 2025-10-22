@@ -222,6 +222,7 @@ func TestUpdate(t *testing.T) {
 	assert.NoError(t, err)
 
 	expected := strings.Join([]string{
+		"<!-- Generated with https://github.com/reakaleek/gh-action-readme -->",
 		"<!--name-->Test<!--/name-->",
 		"<!--description-->",
 		"Test description.",
@@ -259,4 +260,39 @@ func TestCopy(t *testing.T) {
 	// assert
 	assert.Equal(t, doc.ToString(), duplicate.ToString())
 
+}
+
+func TestEnsureGeneratedCommentAddsWhenMissing(t *testing.T) {
+	// arrange
+	doc := Doc{
+		lines: []string{
+			"# <!--name-->Test<!--/name-->",
+			"<!--description-->",
+		},
+	}
+
+	// act
+	doc.ensureGeneratedComment()
+
+	// assert
+	assert.Equal(t, "<!-- Generated with https://github.com/reakaleek/gh-action-readme -->", doc.lines[0])
+	assert.Equal(t, 3, len(doc.lines))
+}
+
+func TestEnsureGeneratedCommentDoesNotDuplicateWhenExists(t *testing.T) {
+	// arrange
+	doc := Doc{
+		lines: []string{
+			"<!-- Generated with https://github.com/reakaleek/gh-action-readme -->",
+			"# <!--name-->Test<!--/name-->",
+			"<!--description-->",
+		},
+	}
+
+	// act
+	doc.ensureGeneratedComment()
+
+	// assert
+	assert.Equal(t, "<!-- Generated with https://github.com/reakaleek/gh-action-readme -->", doc.lines[0])
+	assert.Equal(t, 3, len(doc.lines))
 }
