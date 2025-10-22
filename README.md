@@ -4,6 +4,7 @@
 ![GitHub Release Date](https://img.shields.io/github/release-date/reakaleek/gh-action-readme?display_date=published_at&logo=github)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/reakaleek/gh-action-readme)
 ![GitHub License](https://img.shields.io/github/license/reakaleek/gh-action-readme)
+[![ci](https://github.com/reakaleek/gh-action-readme/actions/workflows/ci.yml/badge.svg)](https://github.com/reakaleek/gh-action-readme/actions/workflows/ci.yml)
 
 A GitHub CLI extension to inject GitHub Actions metadata into `README.md` markdown files.
 
