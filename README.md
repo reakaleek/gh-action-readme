@@ -74,7 +74,7 @@ Add the following configuration to the `.pre-commit-config.yaml` file.
 ```yaml
 repos:
   - repo: https://github.com/reakaleek/gh-action-readme
-    rev: v0.4.0
+    rev: v0.4.1
     hooks:
       - id: action-readme
 ```
