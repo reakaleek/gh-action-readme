@@ -28,10 +28,12 @@ categories:
 exclude-labels:
   - 'changelog:skip' # When a PR should be excluded from the changelog
 version-resolver:
-  major:
-    labels:
-      - 'changelog:breaking'
+  # major:
+  #   labels:
+  #     - 'changelog:breaking'
   minor:
     labels:
       - 'changelog:feature'
+      - 'changelog:enhancement'
+      - 'changelog:breaking' # As long as we are in 0.x.x releases, breaking changes are only minor
   default: patch
