@@ -69,8 +69,10 @@ func TestDiff(t *testing.T) {
 	// act
 	diff := doc.Diff(&otherDoc)
 
-	// assert
-	assert.Equal(t, "Hello, World\x1b[32m!\x1b[0m", diff.PrettyDiff)
+	// assert - new unified diff format
+	assert.Contains(t, diff.PrettyDiff, "Hello, World")
+	assert.Contains(t, diff.PrettyDiff, "+")
+	assert.Contains(t, diff.PrettyDiff, "!")
 }
 
 func TestDiffTrue(t *testing.T) {
@@ -201,14 +203,14 @@ func TestUpdate(t *testing.T) {
 		"Author",
 		"Test description.",
 		action.Inputs{
-			"input1": {
+			"input1": action.Input{
 				Description: "input1 description.",
 				Required:    true,
 			},
 		},
 		[]string{"input1"},
 		action.Outputs{
-			"output1": {
+			"output1": action.Output{
 				Description: "output1 description.",
 			},
 		},

@@ -32,7 +32,7 @@ func NewDoc(name string) (*Doc, error) {
 		if err != nil {
 			return nil, err
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		newDoc := &Doc{
 			name: name,
 			lines: []string{
@@ -222,11 +222,77 @@ func (d *Doc) GetName() string {
 func (d *Doc) Diff(doc *Doc) DiffResult {
 	dmp := diffmatchpatch.New()
 	diffs := dmp.DiffMain(d.ToString(), doc.ToString(), false)
-	prettyDiff := dmp.DiffPrettyText(diffs)
-	return DiffResult{
-		PrettyDiff: prettyDiff,
-		HasDiff:    len(diffs) > 1,
+	
+	// Check if there are actual differences
+	hasDiff := len(diffs) > 1
+	if !hasDiff {
+		return DiffResult{
+			PrettyDiff: "",
+			HasDiff:    false,
+		}
 	}
+	
+	// Create a unified diff format
+	var prettyDiff strings.Builder
+	for _, diff := range diffs {
+		switch diff.Type {
+		case diffmatchpatch.DiffInsert:
+			// Green for additions
+			lines := strings.Split(diff.Text, "\n")
+			for _, line := range lines {
+				if line != "" {
+					prettyDiff.WriteString(fmt.Sprintf("\x1b[32m+ %s\x1b[0m\n", line))
+				}
+			}
+		case diffmatchpatch.DiffDelete:
+			// Red for deletions
+			lines := strings.Split(diff.Text, "\n")
+			for _, line := range lines {
+				if line != "" {
+					prettyDiff.WriteString(fmt.Sprintf("\x1b[31m- %s\x1b[0m\n", line))
+				}
+			}
+		case diffmatchpatch.DiffEqual:
+			// Show context (3 lines before and after changes)
+			lines := strings.Split(diff.Text, "\n")
+			// For context, only show a few lines around changes
+			if len(lines) > 6 {
+				// Show first 3 lines
+				for i := 0; i < 3 && i < len(lines); i++ {
+					if lines[i] != "" {
+						prettyDiff.WriteString(fmt.Sprintf("  %s\n", lines[i]))
+					}
+				}
+				if len(lines) > 6 {
+					prettyDiff.WriteString("  ...\n")
+				}
+				// Show last 3 lines
+				for i := max(3, len(lines)-3); i < len(lines); i++ {
+					if lines[i] != "" {
+						prettyDiff.WriteString(fmt.Sprintf("  %s\n", lines[i]))
+					}
+				}
+			} else {
+				for _, line := range lines {
+					if line != "" {
+						prettyDiff.WriteString(fmt.Sprintf("  %s\n", line))
+					}
+				}
+			}
+		}
+	}
+	
+	return DiffResult{
+		PrettyDiff: prettyDiff.String(),
+		HasDiff:    hasDiff,
+	}
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 type DiffResult struct {

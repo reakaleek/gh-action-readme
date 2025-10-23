@@ -38,9 +38,12 @@ func NewCommand() *cli.Command {
 			files := ctx.Args().Slice()
 			for _, file := range files {
 				dir := filepath.Dir(file)
-				actionPath := filepath.Join(dir, "action.yml")
 				readmePath := filepath.Join(dir, "README.md")
-				if !fileExists(actionPath) {
+				
+				// Look for action.yml or action.yaml
+				actionPath, err := findActionFile(dir)
+				if err != nil {
+					// No action file found, skip this directory
 					continue
 				}
 				doc, err := markdown.NewDoc(readmePath)
@@ -70,7 +73,16 @@ func NewCommand() *cli.Command {
 	}
 }
 
-func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
+func findActionFile(dir string) (string, error) {
+	// Check for action.yml first (more common)
+	ymlPath := filepath.Join(dir, "action.yml")
+	if _, err := os.Stat(ymlPath); err == nil {
+		return ymlPath, nil
+	}
+	// Check for action.yaml
+	yamlPath := filepath.Join(dir, "action.yaml")
+	if _, err := os.Stat(yamlPath); err == nil {
+		return yamlPath, nil
+	}
+	return "", os.ErrNotExist
 }
