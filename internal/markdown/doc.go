@@ -88,8 +88,43 @@ func NewDocOrCreate(name string) (*Doc, error) {
 }
 
 func (d *Doc) updateName(name string) {
-	d.clearSection(nameSectionName)
-	d.insertSection(nameSectionName, name)
+	d.updateAllSections(nameSectionName, name)
+}
+
+func (d *Doc) updateAllSections(sectionName string, content string) {
+	// Find all section pairs ONCE, then process them
+	startIndices := d.findAllIndices(startCommentPattern(sectionName))
+	endIndices := d.findAllIndices(endCommentPattern(sectionName))
+	
+	if len(startIndices) != len(endIndices) {
+		return
+	}
+	
+	// Process in reverse order to avoid index shifting issues
+	for i := len(startIndices) - 1; i >= 0; i-- {
+		startIndex := startIndices[i]
+		endIndex := endIndices[i]
+		
+		if startIndex == endIndex {
+			// Single-line format: <!--name--><!--/name-->
+			d.lines[startIndex] = insertBetweenMatches(
+				d.lines[startIndex],
+				startCommentPattern(sectionName),
+				endCommentPattern(sectionName),
+				strings.TrimSpace(content),
+			)
+		} else {
+			// Multi-line format: clear and insert in one operation
+			// Remove old content and closing tag
+			d.removeLines(startIndex+1, endIndex+1)
+			// Add new content and closing tag
+			d.insertAfterIndex(
+				startIndex,
+				strings.TrimSpace(content),
+				fmt.Sprintf("<!--/%s-->", sectionName),
+			)
+		}
+	}
 }
 
 func (d *Doc) updateDescription(description string) {
@@ -185,6 +220,17 @@ func (d *Doc) findIndex(pattern string) int {
 		}
 	}
 	return -1
+}
+
+func (d *Doc) findAllIndices(pattern string) []int {
+	r := regexp.MustCompile(pattern)
+	indices := []int{}
+	for i, line := range d.lines {
+		if r.MatchString(line) {
+			indices = append(indices, i)
+		}
+	}
+	return indices
 }
 
 func (d *Doc) insertAfterPrefix(prefix string, lines ...string) {
@@ -348,37 +394,54 @@ type DiffResult struct {
 }
 
 func (d *Doc) UpdateUsage(a *action.Action) error {
-	usageIndex := d.findIndex(startCommentPattern(usageSectionName))
-	usageEndIndex := d.findIndex(endCommentPattern(usageSectionName))
-	if usageIndex == -1 {
+	// Find all usage sections
+	usageStartIndices := d.findAllIndices(startCommentPattern(usageSectionName))
+	usageEndIndices := d.findAllIndices(endCommentPattern(usageSectionName))
+	
+	if len(usageStartIndices) != len(usageEndIndices) {
+		// Check if there's a missing end comment for any usage section
+		if len(usageStartIndices) > 0 && len(usageEndIndices) == 0 {
+			return fmt.Errorf("missing end comment for usage section. add <!--/usage--> to the end of the usage section")
+		}
 		return nil
 	}
-	if usageEndIndex == -1 {
-		return fmt.Errorf("missing end comment for usage section. add <!--/usage--> to the end of the usage section")
-	}
-	version, err := getAttribute(d.lines[usageIndex], "version")
-	if err != nil {
-		return err
-	}
-	version, err = parseEnvVariable(version)
-	if err != nil {
-		return err
-	}
-	actionGlob, err := getAttribute(d.lines[usageIndex], "action")
-	if err != nil {
-		return err
-	}
-	versionedActionRe := regexp.MustCompile(`uses:\s*(\S+)@\S+`)
-	if usageEndIndex > 0 && usageEndIndex > usageIndex {
-		for i := usageIndex; i < usageEndIndex; i += 1 {
-			submatch := versionedActionRe.FindStringSubmatch(d.lines[i])
-			if len(submatch) == 2 {
-				actionName := submatch[1]
-				globMatch, _ := doublestar.Match(actionGlob, actionName)
-				if globMatch {
-					pattern := strings.ReplaceAll(fmt.Sprintf("%s@\\S+", actionName), "/", "\\/")
-					re := regexp.MustCompile(pattern)
-					d.lines[i] = re.ReplaceAllString(d.lines[i], fmt.Sprintf("%s@%s", actionName, version))
+	
+	// Process each usage section independently (in reverse order to handle index shifts)
+	for i := len(usageStartIndices) - 1; i >= 0; i-- {
+		usageIndex := usageStartIndices[i]
+		usageEndIndex := usageEndIndices[i]
+		
+		if usageIndex == -1 || usageEndIndex == -1 {
+			continue
+		}
+		
+		// Get attributes for this specific usage section
+		version, err := getAttribute(d.lines[usageIndex], "version")
+		if err != nil {
+			return err
+		}
+		version, err = parseEnvVariable(version)
+		if err != nil {
+			return err
+		}
+		actionGlob, err := getAttribute(d.lines[usageIndex], "action")
+		if err != nil {
+			return err
+		}
+		
+		// Update only within this usage section
+		versionedActionRe := regexp.MustCompile(`uses:\s*(\S+)@\S+`)
+		if usageEndIndex > 0 && usageEndIndex > usageIndex {
+			for j := usageIndex; j < usageEndIndex; j += 1 {
+				submatch := versionedActionRe.FindStringSubmatch(d.lines[j])
+				if len(submatch) == 2 {
+					actionName := submatch[1]
+					globMatch, _ := doublestar.Match(actionGlob, actionName)
+					if globMatch {
+						pattern := strings.ReplaceAll(fmt.Sprintf("%s@\\S+", actionName), "/", "\\/")
+						re := regexp.MustCompile(pattern)
+						d.lines[j] = re.ReplaceAllString(d.lines[j], fmt.Sprintf("%s@%s", actionName, version))
+					}
 				}
 			}
 		}

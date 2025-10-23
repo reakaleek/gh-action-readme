@@ -409,3 +409,555 @@ func TestUpdatePreservesEmptyLines(t *testing.T) {
 		}
 	}
 }
+
+// Multiple Name Placeholder Tests
+
+func TestMultipleNamePlaceholders_TwoOccurrences(t *testing.T) {
+	// arrange
+	doc := Doc{
+		lines: []string{
+			"# <!--name--><!--/name-->",
+			"",
+			"## What is <!--name--><!--/name-->?",
+			"This is a test.",
+		},
+	}
+
+	// act
+	doc.updateName("My Action")
+
+	// assert
+	expected := strings.Join([]string{
+		"# <!--name-->My Action<!--/name-->",
+		"",
+		"## What is <!--name-->My Action<!--/name-->?",
+		"This is a test.",
+	}, "\n")
+	assert.Equal(t, expected, doc.ToString())
+}
+
+func TestMultipleNamePlaceholders_ThreeOccurrences(t *testing.T) {
+	// arrange
+	doc := Doc{
+		lines: []string{
+			"# <!--name--><!--/name-->",
+			"",
+			"The <!--name--><!--/name--> action helps you...",
+			"",
+			"## Using <!--name--><!--/name-->",
+			"Some content here.",
+		},
+	}
+
+	// act
+	doc.updateName("Super Action")
+
+	// assert
+	expected := strings.Join([]string{
+		"# <!--name-->Super Action<!--/name-->",
+		"",
+		"The <!--name-->Super Action<!--/name--> action helps you...",
+		"",
+		"## Using <!--name-->Super Action<!--/name-->",
+		"Some content here.",
+	}, "\n")
+	assert.Equal(t, expected, doc.ToString())
+}
+
+func TestMultipleNamePlaceholders_SingleLine(t *testing.T) {
+	// arrange - all on single lines
+	doc := Doc{
+		lines: []string{
+			"# <!--name--><!--/name-->",
+			"Welcome to <!--name--><!--/name-->",
+		},
+	}
+
+	// act
+	doc.updateName("Test Tool")
+
+	// assert
+	expected := strings.Join([]string{
+		"# <!--name-->Test Tool<!--/name-->",
+		"Welcome to <!--name-->Test Tool<!--/name-->",
+	}, "\n")
+	assert.Equal(t, expected, doc.ToString())
+}
+
+func TestMultipleNamePlaceholders_MixedFormats(t *testing.T) {
+	// arrange - mix of single-line and multi-line
+	doc := Doc{
+		lines: []string{
+			"# <!--name-->",
+			"<!--/name-->",
+			"",
+			"Welcome to <!--name--><!--/name-->",
+		},
+	}
+
+	// act
+	doc.updateName("Mixed Action")
+
+	// assert
+	expected := strings.Join([]string{
+		"# <!--name-->",
+		"Mixed Action",
+		"<!--/name-->",
+		"",
+		"Welcome to <!--name-->Mixed Action<!--/name-->",
+	}, "\n")
+	assert.Equal(t, expected, doc.ToString())
+}
+
+func TestMultipleNamePlaceholders_PreservesContent(t *testing.T) {
+	// arrange
+	doc := Doc{
+		lines: []string{
+			"# <!--name--><!--/name-->",
+			"",
+			"This is custom content that should not change.",
+			"",
+			"## About <!--name--><!--/name-->",
+			"",
+			"More custom content here.",
+		},
+	}
+
+	// act
+	doc.updateName("Preserve Test")
+
+	// assert
+	str := doc.ToString()
+	assert.Contains(t, str, "This is custom content that should not change.")
+	assert.Contains(t, str, "More custom content here.")
+	assert.Contains(t, str, "# <!--name-->Preserve Test<!--/name-->")
+	assert.Contains(t, str, "## About <!--name-->Preserve Test<!--/name-->")
+}
+
+// Multiple Usage Placeholder Tests
+
+func TestMultipleUsagePlaceholders_DifferentActions(t *testing.T) {
+	// arrange
+	doc := Doc{
+		lines: []string{
+			"## Usage with Action A",
+			"<!--usage action=\"owner/action-a\" version=\"v1\"-->",
+			"```yaml",
+			"uses: owner/action-a@main",
+			"```",
+			"<!--/usage-->",
+			"",
+			"## Usage with Action B",
+			"<!--usage action=\"owner/action-b\" version=\"v2\"-->",
+			"```yaml",
+			"uses: owner/action-b@main",
+			"```",
+			"<!--/usage-->",
+		},
+	}
+
+	// act
+	err := doc.UpdateUsage(nil)
+
+	// assert
+	assert.NoError(t, err)
+	assert.Contains(t, doc.ToString(), "uses: owner/action-a@v1")
+	assert.Contains(t, doc.ToString(), "uses: owner/action-b@v2")
+}
+
+func TestMultipleUsagePlaceholders_SameAction(t *testing.T) {
+	// arrange
+	doc := Doc{
+		lines: []string{
+			"## Basic Usage",
+			"<!--usage action=\"myorg/myaction\" version=\"v1.0.0\"-->",
+			"```yaml",
+			"uses: myorg/myaction@main",
+			"```",
+			"<!--/usage-->",
+			"",
+			"## Advanced Usage",
+			"<!--usage action=\"myorg/myaction\" version=\"v2.0.0\"-->",
+			"```yaml",
+			"uses: myorg/myaction@main",
+			"```",
+			"<!--/usage-->",
+		},
+	}
+
+	// act
+	err := doc.UpdateUsage(nil)
+
+	// assert
+	assert.NoError(t, err)
+	lines := strings.Split(doc.ToString(), "\n")
+	
+	// Check first usage has v1.0.0
+	foundFirstUsage := false
+	for i, line := range lines {
+		if strings.Contains(line, "## Basic Usage") {
+			for j := i; j < i+5 && j < len(lines); j++ {
+				if strings.Contains(lines[j], "uses: myorg/myaction@v1.0.0") {
+					foundFirstUsage = true
+					break
+				}
+			}
+		}
+	}
+	assert.True(t, foundFirstUsage, "First usage should have v1.0.0")
+	
+	// Check second usage has v2.0.0
+	foundSecondUsage := false
+	for i, line := range lines {
+		if strings.Contains(line, "## Advanced Usage") {
+			for j := i; j < i+5 && j < len(lines); j++ {
+				if strings.Contains(lines[j], "uses: myorg/myaction@v2.0.0") {
+					foundSecondUsage = true
+					break
+				}
+			}
+		}
+	}
+	assert.True(t, foundSecondUsage, "Second usage should have v2.0.0")
+}
+
+func TestMultipleUsagePlaceholders_IndependentUpdate(t *testing.T) {
+	// arrange - each section should only update its matching action
+	doc := Doc{
+		lines: []string{
+			"<!--usage action=\"elastic/*\" version=\"v1\"-->",
+			"```yaml",
+			"uses: elastic/action-test@main",
+			"uses: other/action@main",
+			"```",
+			"<!--/usage-->",
+			"",
+			"<!--usage action=\"other/*\" version=\"v2\"-->",
+			"```yaml",
+			"uses: elastic/action-test@main",
+			"uses: other/action@main",
+			"```",
+			"<!--/usage-->",
+		},
+	}
+
+	// act
+	err := doc.UpdateUsage(nil)
+
+	// assert
+	assert.NoError(t, err)
+	lines := strings.Split(doc.ToString(), "\n")
+	
+	// In first section, only elastic/* should be updated to v1
+	firstSectionEnd := 0
+	for i, line := range lines {
+		if i > 0 && strings.Contains(line, "<!--/usage-->") {
+			firstSectionEnd = i
+			break
+		}
+	}
+	
+	firstSection := strings.Join(lines[0:firstSectionEnd+1], "\n")
+	assert.Contains(t, firstSection, "uses: elastic/action-test@v1")
+	assert.Contains(t, firstSection, "uses: other/action@main")
+	
+	// In second section, only other/* should be updated to v2
+	secondSection := strings.Join(lines[firstSectionEnd+1:], "\n")
+	assert.Contains(t, secondSection, "uses: elastic/action-test@main")
+	assert.Contains(t, secondSection, "uses: other/action@v2")
+}
+
+func TestMultipleUsagePlaceholders_EnvironmentVariable(t *testing.T) {
+	// arrange
+	t.Setenv("VERSION_A", "v1.5.0")
+	t.Setenv("VERSION_B", "v2.3.0")
+	
+	doc := Doc{
+		lines: []string{
+			"<!--usage action=\"owner/action-a\" version=\"env:VERSION_A\"-->",
+			"```yaml",
+			"uses: owner/action-a@main",
+			"```",
+			"<!--/usage-->",
+			"",
+			"<!--usage action=\"owner/action-b\" version=\"env:VERSION_B\"-->",
+			"```yaml",
+			"uses: owner/action-b@main",
+			"```",
+			"<!--/usage-->",
+		},
+	}
+
+	// act
+	err := doc.UpdateUsage(nil)
+
+	// assert
+	assert.NoError(t, err)
+	assert.Contains(t, doc.ToString(), "uses: owner/action-a@v1.5.0")
+	assert.Contains(t, doc.ToString(), "uses: owner/action-b@v2.3.0")
+}
+
+func TestMultipleUsagePlaceholders_NoMatch(t *testing.T) {
+	// arrange - usage section where action glob doesn't match any uses: lines
+	doc := Doc{
+		lines: []string{
+			"<!--usage action=\"nomatch/*\" version=\"v1\"-->",
+			"```yaml",
+			"uses: other/action@main",
+			"```",
+			"<!--/usage-->",
+		},
+	}
+
+	// act
+	err := doc.UpdateUsage(nil)
+
+	// assert
+	assert.NoError(t, err)
+	// Should remain unchanged since pattern doesn't match
+	assert.Contains(t, doc.ToString(), "uses: other/action@main")
+}
+
+func TestMultipleUsagePlaceholders_ComplexGlob(t *testing.T) {
+	// arrange
+	doc := Doc{
+		lines: []string{
+			"<!--usage action=\"elastic/oblt-actions/*\" version=\"v1\"-->",
+			"```yaml",
+			"uses: elastic/oblt-actions/test@main",
+			"uses: elastic/oblt-actions/deploy@main",
+			"uses: other/action@main",
+			"```",
+			"<!--/usage-->",
+			"",
+			"<!--usage action=\"*/checkout\" version=\"v4\"-->",
+			"```yaml",
+			"uses: actions/checkout@v3",
+			"```",
+			"<!--/usage-->",
+		},
+	}
+
+	// act
+	err := doc.UpdateUsage(nil)
+
+	// assert
+	assert.NoError(t, err)
+	str := doc.ToString()
+	assert.Contains(t, str, "uses: elastic/oblt-actions/test@v1")
+	assert.Contains(t, str, "uses: elastic/oblt-actions/deploy@v1")
+	assert.Contains(t, str, "uses: other/action@main")
+	assert.Contains(t, str, "uses: actions/checkout@v4")
+}
+
+// Mixed Scenario Tests
+
+func TestMultiplePlaceholders_NameAndUsage(t *testing.T) {
+	// arrange - multiple names and multiple usages together
+	doc := Doc{
+		lines: []string{
+			"# <!--name--><!--/name-->",
+			"",
+			"## About <!--name--><!--/name-->",
+			"",
+			"<!--usage action=\"owner/action\" version=\"v1\"-->",
+			"```yaml",
+			"uses: owner/action@main",
+			"```",
+			"<!--/usage-->",
+			"",
+			"## Advanced",
+			"<!--usage action=\"owner/action\" version=\"v2\"-->",
+			"```yaml",
+			"uses: owner/action@main",
+			"```",
+			"<!--/usage-->",
+		},
+	}
+
+	a := action.New(
+		"Complex Action",
+		"Author",
+		"Description",
+		action.Inputs{},
+		[]string{},
+		action.Outputs{},
+		[]string{},
+	)
+
+	// act
+	err := doc.Update(a)
+
+	// assert
+	assert.NoError(t, err)
+	str := doc.ToString()
+	assert.Contains(t, str, "# <!--name-->Complex Action<!--/name-->")
+	assert.Contains(t, str, "## About <!--name-->Complex Action<!--/name-->")
+	
+	lines := strings.Split(str, "\n")
+	v1Found := false
+	v2Found := false
+	for _, line := range lines {
+		if strings.Contains(line, "uses: owner/action@v1") {
+			v1Found = true
+		}
+		if strings.Contains(line, "uses: owner/action@v2") {
+			v2Found = true
+		}
+	}
+	assert.True(t, v1Found, "Should find v1 usage")
+	assert.True(t, v2Found, "Should find v2 usage")
+}
+
+func TestMultiplePlaceholders_WithSinglePlaceholders(t *testing.T) {
+	// arrange - multiple names/usages with single inputs/outputs
+	doc := Doc{
+		lines: []string{
+			"# <!--name--><!--/name-->",
+			"<!--description-->",
+			"<!--/description-->",
+			"",
+			"## Inputs",
+			"<!--inputs-->",
+			"<!--/inputs-->",
+			"",
+			"## About <!--name--><!--/name-->",
+			"",
+			"<!--usage action=\"test/action\" version=\"v1\"-->",
+			"```yaml",
+			"uses: test/action@main",
+			"```",
+			"<!--/usage-->",
+		},
+	}
+
+	a := action.New(
+		"Hybrid Action",
+		"Author",
+		"Test description.",
+		action.Inputs{
+			"input1": action.Input{
+				Description: "Test input",
+				Required:    true,
+			},
+		},
+		[]string{"input1"},
+		action.Outputs{},
+		[]string{},
+	)
+
+	// act
+	err := doc.Update(a)
+
+	// assert
+	assert.NoError(t, err)
+	str := doc.ToString()
+	
+	// Both name placeholders should be updated
+	nameCount := strings.Count(str, "Hybrid Action")
+	assert.Equal(t, 2, nameCount, "Both name placeholders should be updated")
+	
+	// Description should be updated
+	assert.Contains(t, str, "Test description.")
+	
+	// Inputs table should be present
+	assert.Contains(t, str, "Test input")
+	
+	// Usage should be updated
+	assert.Contains(t, str, "uses: test/action@v1")
+}
+
+func TestMultiplePlaceholders_BackwardCompatibility(t *testing.T) {
+	// arrange - single placeholder should still work
+	doc := Doc{
+		lines: []string{
+			"# <!--name--><!--/name-->",
+			"<!--description-->",
+			"<!--/description-->",
+		},
+	}
+
+	a := action.New(
+		"Single Action",
+		"Author",
+		"Description text.",
+		action.Inputs{},
+		[]string{},
+		action.Outputs{},
+		[]string{},
+	)
+
+	// act
+	err := doc.Update(a)
+
+	// assert
+	assert.NoError(t, err)
+	expected := strings.Join([]string{
+		"<!-- Generated by https://github.com/reakaleek/gh-action-readme -->",
+		"# <!--name-->Single Action<!--/name-->",
+		"<!--description-->",
+		"Description text.",
+		"<!--/description-->",
+	}, "\n")
+	assert.Equal(t, expected, doc.ToString())
+}
+
+// Edge Case Tests
+
+func TestMultiplePlaceholders_EmptyContent(t *testing.T) {
+	// arrange - empty name between tags
+	doc := Doc{
+		lines: []string{
+			"# <!--name--><!--/name-->",
+			"About <!--name--><!--/name-->",
+		},
+	}
+
+	// act
+	doc.updateName("")
+
+	// assert
+	expected := strings.Join([]string{
+		"# <!--name--><!--/name-->",
+		"About <!--name--><!--/name-->",
+	}, "\n")
+	assert.Equal(t, expected, doc.ToString())
+}
+
+func TestMultiplePlaceholders_WhitespaceVariations(t *testing.T) {
+	// arrange - various whitespace in tags
+	doc := Doc{
+		lines: []string{
+			"# <!-- name --><!-- /name -->",
+			"About <!--  name  --><!--  /name  -->",
+		},
+	}
+
+	// act
+	doc.updateName("Whitespace Test")
+
+	// assert
+	str := doc.ToString()
+	// Both should be updated despite whitespace variations
+	nameCount := strings.Count(str, "Whitespace Test")
+	assert.Equal(t, 2, nameCount, "Both placeholders should be updated despite whitespace")
+}
+
+func TestMultiplePlaceholders_MissingClosingTag(t *testing.T) {
+	// arrange - unpaired usage tags
+	doc := Doc{
+		lines: []string{
+			"<!--usage action=\"test/action\" version=\"v1\"-->",
+			"```yaml",
+			"uses: test/action@main",
+			"```",
+		},
+	}
+
+	// act
+	err := doc.UpdateUsage(nil)
+
+	// assert
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "missing end comment for usage section")
+}

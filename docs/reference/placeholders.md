@@ -49,6 +49,7 @@ name: My Awesome Action
 - Often used in the main heading
 - Can be used inline or as standalone text
 - Common pattern: `# <!--name--><!--/name-->` (self-closing on same line)
+- **Supports multiple occurrences** - all instances will be updated with the action name
 
 ---
 
@@ -81,6 +82,7 @@ description: |
 - Preserves multi-line descriptions
 - Respects line breaks from action.yml
 - Often placed directly under the main heading
+- **Single occurrence only** - only the first instance will be updated
 
 ---
 
@@ -137,6 +139,7 @@ inputs:
 - Missing defaults show as a single space in backticks: ` `
 - Inputs appear in the order defined in action.yml
 - Empty table is generated if no inputs exist
+- **Single occurrence only** - only the first instance will be updated
 
 ---
 
@@ -186,6 +189,7 @@ outputs:
 - Output names wrapped in backticks
 - Empty table if no outputs defined
 - Outputs appear in definition order
+- **Single occurrence only** - only the first instance will be updated
 
 ---
 
@@ -244,10 +248,12 @@ Use `env:VARIABLE` to reference environment variables:
 <!--usage action="org/repo" version="env:VERSION"-->
 ```yaml
 steps:
-  - uses: org/repo@${{ env.VERSION }}
+  - uses: org/repo@v1.0.0
 ```
 <!--/usage-->
 ````
+
+When you run the tool with `VERSION=v1.0.0` set in your environment, it will update the version in the code block to `v1.0.0`.
 
 **Notes:**
 - Automatically updates all references to the action with the correct version
@@ -255,6 +261,7 @@ steps:
 - Can have multiple usage blocks with different versions
 - The usage block preserves your custom example code
 - Only the version references are updated
+- **Supports multiple occurrences** - each instance updates independently based on its own attributes
 
 ---
 
@@ -286,12 +293,22 @@ Generates a table of contents from document headings.
 - Respects heading hierarchy (indentation)
 - Excludes the main title (first `#` heading)
 - Regenerates on each update
+- **Single occurrence only** - only the first instance will be updated
 
 ---
 
 ## Multiple Placeholders
 
-You can use multiple instances of the same placeholder:
+Some placeholders can be used multiple times in a single README, while others only process the first occurrence.
+
+### Supported for Multiple Occurrences
+
+The following placeholders support multiple instances and will update all occurrences:
+
+- **`name`** - Each occurrence is updated with the action name
+- **`usage`** - Each occurrence is updated independently based on its own `action` and `version` attributes
+
+**Example:**
 
 ```markdown
 # <!--name--><!--/name-->
@@ -301,9 +318,38 @@ You can use multiple instances of the same placeholder:
 ## What is <!--name--><!--/name-->?
 
 The <!--name--><!--/name--> action helps you...
+
+## Basic Usage
+<!--usage action="org/repo" version="v1.0.0"-->
+```yaml
+steps:
+  - uses: org/repo@main
+```
+<!--/usage-->
+
+## Advanced Usage
+<!--usage action="org/repo" version="v2.0.0"-->
+```yaml
+steps:
+  - uses: org/repo@main
+    with:
+      advanced: true
+```
+<!--/usage-->
 ```
 
-All instances are updated with the same content.
+All three `name` placeholders will be updated with the action name. Each `usage` placeholder will update its code block with its specified version independently.
+
+### Single Occurrence Only
+
+The following placeholders only process the **first occurrence**. Additional instances will be ignored:
+
+- **`description`** - Only the first occurrence is updated
+- **`inputs`** - Only the first occurrence is updated  
+- **`outputs`** - Only the first occurrence is updated
+- **`toc`** - Only the first occurrence is updated
+
+**Why?** These placeholders generate structured content (tables, lists) that should typically appear once in a README. If you need the same information in multiple places, consider using custom content or restructuring your README.
 
 ## Placeholder Nesting
 
