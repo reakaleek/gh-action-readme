@@ -8,8 +8,8 @@
 
 A GitHub CLI extension to inject GitHub Actions metadata into `README.md` markdown files.
 
-> [!WARNING]
-> This project is in active development and is not yet stable.
+> [!TIP]
+> Do you need to manage multiple actions in a github-actions monorepo? Check out the [How to Manage Monorepos with Multiple Actions](./docs/how-to/manage-monorepos.md) documentation for more information.
 
 ## Prerequisites
 - [GitHub CLI](https://cli.github.com/) installed and authenticated.
@@ -67,6 +67,10 @@ The `README.md` file will be updated with the metadata from the `action.yml` fil
 ```
 
 ## Pre-commit (recommended)
+
+> [!NOTE]
+> Using gh-action-readme as a pre-commit hook does not require
+> you to install the `gh-action-readme` extension in github cli.
 
 You can also use the `gh-action-readme` extension as a [pre-commit](https://pre-commit.com/) hook to automatically update the `README.md` file before committing changes.
 
