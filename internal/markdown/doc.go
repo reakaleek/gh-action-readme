@@ -96,7 +96,7 @@ func (d *Doc) updateOutputs(outputsMatrix [][]string) {
 
 // hasPlaceholders checks if the document contains any placeholder comments
 func (d *Doc) hasPlaceholders() bool {
-    var placeholders []string = []string{
+    placeholders := []string{
 		nameSectionName,
 		descriptionSectionName,
 		inputsSectionName,
@@ -116,7 +116,6 @@ func (d *Doc) Update(a *action.Action) error {
 	if !d.hasPlaceholders() {
 		return nil
 	}
-	
 	// File has placeholders, proceed with updates
 	d.ensureGeneratedComment()
 	d.updateName(a.Name)
