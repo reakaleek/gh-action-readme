@@ -66,6 +66,14 @@ The `README.md` file will be updated with the metadata from the `action.yml` fil
 +<!--/inputs-->
 ```
 
+Checkout the documentation for more information on how to use the `gh-action-readme` extension.
+- [Getting Started](./docs/tutorials/getting-started.md) - Quick start tutorial (5 minutes)
+- [Building a Complete Action README](./docs/tutorials/complete-action-readme.md) - Full example with all features
+- [Set up pre-commit hooks](./docs/how-to/setup-precommit.md) - Automatically update READMEs on commit
+- [Manage monorepos with multiple actions](./docs/how-to/manage-monorepos.md) - Bulk operations on multiple actions
+- [Check for documentation drift](./docs/how-to/check-documentation-drift.md) - Verify docs are up-to-date
+
+
 ## Pre-commit (recommended)
 
 > [!NOTE]
