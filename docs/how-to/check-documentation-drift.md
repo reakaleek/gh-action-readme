@@ -183,7 +183,7 @@ The best way to prevent drift is to catch it before committing:
 # .pre-commit-config.yaml
 repos:
   - repo: https://github.com/reakaleek/gh-action-readme
-    rev: v0.4.1
+    rev: v0.5.0
     hooks:
       - id: action-readme
 ```

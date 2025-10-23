@@ -30,7 +30,7 @@ Create a `.pre-commit-config.yaml` file in your repository root:
 ```yaml
 repos:
   - repo: https://github.com/reakaleek/gh-action-readme
-    rev: v0.4.1  # Use the latest version
+    rev: v0.5.0  # Use the latest version
     hooks:
       - id: action-readme
 ```
@@ -122,7 +122,7 @@ If your repository has multiple actions, you can configure pre-commit to run onl
 ```yaml
 repos:
   - repo: https://github.com/reakaleek/gh-action-readme
-    rev: v0.4.1
+    rev: v0.5.0
     hooks:
       - id: action-readme
         files: '^my-action/'  # Only run in my-action directory
@@ -135,7 +135,7 @@ For monorepos, enable recursive mode:
 ```yaml
 repos:
   - repo: https://github.com/reakaleek/gh-action-readme
-    rev: v0.4.1
+    rev: v0.5.0
     hooks:
       - id: action-readme
         args: ['--recursive']
@@ -233,7 +233,7 @@ pre-commit install
 ```yaml
 repos:
   - repo: https://github.com/reakaleek/gh-action-readme
-    rev: v0.4.1
+    rev: v0.5.0
     hooks:
       - id: action-readme
         entry: /usr/local/bin/gh action-readme update
@@ -266,7 +266,7 @@ Use this sparingly and only when necessary!
 ```yaml
 repos:
   - repo: https://github.com/reakaleek/gh-action-readme
-    rev: v0.4.1
+    rev: v0.5.0
     hooks:
       - id: action-readme
         files: 'action\.ya?ml$'  # Only run if action.yml/yaml changed
@@ -284,7 +284,7 @@ repos:
       - id: check-yaml
   
   - repo: https://github.com/reakaleek/gh-action-readme
-    rev: v0.4.1
+    rev: v0.5.0
     hooks:
       - id: action-readme
 ```
