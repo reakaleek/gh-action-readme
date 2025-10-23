@@ -32,7 +32,7 @@ func NewDoc(name string) (*Doc, error) {
 		if err != nil {
 			return nil, err
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		newDoc := &Doc{
 			name: name,
 			lines: []string{

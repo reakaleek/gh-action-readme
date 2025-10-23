@@ -51,7 +51,7 @@ func TestUpdateCommand(t *testing.T) {
 	
 	// Change to tmpDir so action.yml is found
 	originalWd, _ := os.Getwd()
-	defer os.Chdir(originalWd)
+	defer func() { _ = os.Chdir(originalWd) }()
 	err = os.Chdir(tmpDir)
 	require.NoError(t, err)
 	
@@ -90,7 +90,7 @@ func TestUpdateCommandBackwardsCompatible(t *testing.T) {
 	
 	// Change to tmpDir
 	originalWd, _ := os.Getwd()
-	defer os.Chdir(originalWd)
+	defer func() { _ = os.Chdir(originalWd) }()
 	err = os.Chdir(tmpDir)
 	require.NoError(t, err)
 	
@@ -165,8 +165,8 @@ inputs:
 	
 	// Change to tmpDir to run recursive update
 	originalWd, _ := os.Getwd()
-	defer os.Chdir(originalWd)
-	os.Chdir(tmpDir)
+	defer func() { _ = os.Chdir(originalWd) }()
+	_ = os.Chdir(tmpDir)
 	
 	app := &cli.App{
 		Commands: []*cli.Command{update.NewCommand()},
@@ -211,10 +211,10 @@ description: Test action
 			err = os.WriteFile(readmePath, []byte(readme), 0644)
 			require.NoError(t, err)
 			
-			// Change to tmpDir
-			originalWd, _ := os.Getwd()
-			defer os.Chdir(originalWd)
-			os.Chdir(tmpDir)
+		// Change to tmpDir
+		originalWd, _ := os.Getwd()
+		defer func() { _ = os.Chdir(originalWd) }()
+		_ = os.Chdir(tmpDir)
 			
 			app := &cli.App{
 				Commands: []*cli.Command{update.NewCommand()},

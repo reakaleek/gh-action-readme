@@ -10,7 +10,7 @@ func PrintSummary(count1 int, label1 string, color1 color.Attribute, count2 int,
 	cyan := color.New(color.FgCyan)
 	num1 := color.New(color1).SprintFunc()
 	num2 := color.New(color2).SprintFunc()
-	cyan.Printf("\nSummary: %s %s, %s %s\n", num1(count1), label1, num2(count2), label2)
+	_, _ = cyan.Printf("\nSummary: %s %s, %s %s\n", num1(count1), label1, num2(count2), label2)
 }
 
 // PrintHeader prints a cyan header line

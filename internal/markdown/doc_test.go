@@ -203,14 +203,14 @@ func TestUpdate(t *testing.T) {
 		"Author",
 		"Test description.",
 		action.Inputs{
-			"input1": {
+			"input1": action.Input{
 				Description: "input1 description.",
 				Required:    true,
 			},
 		},
 		[]string{"input1"},
 		action.Outputs{
-			"output1": {
+			"output1": action.Output{
 				Description: "output1 description.",
 			},
 		},
