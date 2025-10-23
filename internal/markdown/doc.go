@@ -28,21 +28,43 @@ type Doc struct {
 
 func NewDoc(name string) (*Doc, error) {
 	content, err := readFile(name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+	return &Doc{
+		name:  name,
+		lines: strings.Split(content, "\n"),
+	}, nil
+}
+
+// NewEmptyDoc creates an empty Doc with just the name (used for comparing against non-existent files)
+func NewEmptyDoc(name string) *Doc {
+	return &Doc{
+		name:  name,
+		lines: []string{},
+	}
+}
+
+// NewDocOrCreate creates a new Doc from an existing file, or creates a new file with template content if it doesn't exist
+func NewDocOrCreate(name string) (*Doc, error) {
+	content, err := readFile(name)
 	if errors.Is(err, os.ErrNotExist) {
-		f, err := os.Create(name)
-		if err != nil {
-			return nil, err
-		}
-		defer func() { _ = f.Close() }()
+		// Create new file with template
 		newDoc := &Doc{
 			name: name,
 			lines: []string{
 				"# <!--name--><!--/name-->",
 				"<!--description-->",
+				"<!--/description-->",
+				"",
 				"## Inputs",
 				"<!--inputs-->",
+				"<!--/inputs-->",
+				"",
 				"## Outputs",
 				"<!--outputs-->",
+				"<!--/outputs-->",
+				"",
 				"## Usage",
 				"<!--usage action=\"your/action\" version=\"v1\"-->",
 				"```yaml",
@@ -51,15 +73,11 @@ func NewDoc(name string) (*Doc, error) {
 				"  - uses: your/action@v1",
 				"```",
 				"<!--/usage-->",
+				"",
 			},
-		}
-		err = newDoc.WriteToFile()
-		if err != nil {
-			return nil, err
 		}
 		return newDoc, nil
 	}
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
@@ -245,8 +263,15 @@ func (d *Doc) Diff(doc *Doc) DiffResult {
 	dmp := diffmatchpatch.New()
 	diffs := dmp.DiffMain(d.ToString(), doc.ToString(), false)
 	
-	// Check if there are actual differences
-	hasDiff := len(diffs) > 1
+	// Check if there are actual differences (any Insert or Delete operations)
+	hasDiff := false
+	for _, diff := range diffs {
+		if diff.Type != diffmatchpatch.DiffEqual {
+			hasDiff = true
+			break
+		}
+	}
+	
 	if !hasDiff {
 		return DiffResult{
 			PrettyDiff: "",

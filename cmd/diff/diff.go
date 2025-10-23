@@ -1,7 +1,9 @@
 package diff
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/fatih/color"
@@ -69,10 +71,11 @@ func diffRunRecursive(readmeFilename string) error {
 		dir := filepath.Dir(actionPath)
 		readmePath := filepath.Join(dir, readmeFilename)
 		
-		hasDiff, err := diffSingleActionWithOutput(actionPath, readmePath)
+		hasDiff, _, err := diffSingleActionWithOutput(actionPath, readmePath)
 		if err != nil {
 			return fmt.Errorf("error diffing %s: %w", readmePath, err)
 		}
+		
 		if hasDiff {
 			hasAnyDiff = true
 			outOfDate++
@@ -92,30 +95,46 @@ func diffRunRecursive(readmeFilename string) error {
 	return nil
 }
 
-func diffSingleActionWithOutput(actionPath, readmePath string) (bool, error) {
+func diffSingleActionWithOutput(actionPath, readmePath string) (hasDiff bool, fileExists bool, err error) {
 	actionParser := action.NewParser()
 	a, err := actionParser.Parse(actionPath)
 	if err != nil {
-		return false, err
+		return false, false, err
 	}
-	doc, err := markdown.NewDoc(readmePath)
+	
+	var doc *markdown.Doc
+	fileExists = true
+	doc, err = markdown.NewDoc(readmePath)
 	if err != nil {
-		return false, err
+		if errors.Is(err, os.ErrNotExist) {
+			// File doesn't exist, create an empty doc to compare against
+			fileExists = false
+			doc = markdown.NewEmptyDoc(readmePath)
+		} else {
+			return false, false, err
+		}
 	}
-	newDoc := doc.Copy()
-	err = doc.Update(&a)
+	
+	// Create what the file should be
+	expectedDoc, err := markdown.NewDocOrCreate(readmePath)
 	if err != nil {
-		return false, err
+		return false, false, err
 	}
-	diff := newDoc.Diff(doc)
+	err = expectedDoc.Update(&a)
+	if err != nil {
+		return false, false, err
+	}
+	
+	// Compare current state with expected state
+	diff := doc.Diff(expectedDoc)
 	if diff.HasDiff {
 		red := color.New(color.FgRed).SprintFunc()
 		fmt.Printf("%s %s\n\n", red("✗"), readmePath)
 		fmt.Println(diff.PrettyDiff)
 		fmt.Println()
-		return true, nil
+		return true, fileExists, nil
 	}
-	return false, nil
+	return false, fileExists, nil
 }
 
 func diffSingleAction(actionPath, readmePath string) (bool, error) {
@@ -124,16 +143,30 @@ func diffSingleAction(actionPath, readmePath string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	doc, err := markdown.NewDoc(readmePath)
+	
+	var doc *markdown.Doc
+	doc, err = markdown.NewDoc(readmePath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			// File doesn't exist, create an empty doc to compare against
+			doc = markdown.NewEmptyDoc(readmePath)
+		} else {
+			return false, err
+		}
+	}
+	
+	// Create what the file should be
+	expectedDoc, err := markdown.NewDocOrCreate(readmePath)
 	if err != nil {
 		return false, err
 	}
-	newDoc := doc.Copy()
-	err = doc.Update(&a)
+	err = expectedDoc.Update(&a)
 	if err != nil {
 		return false, err
 	}
-	diff := newDoc.Diff(doc)
+	
+	// Compare current state with expected state
+	diff := doc.Diff(expectedDoc)
 	if diff.HasDiff {
 		fmt.Printf("\n%s\n\n", readmePath)
 		fmt.Println(diff.PrettyDiff)

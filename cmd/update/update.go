@@ -96,7 +96,7 @@ func updateSingleActionWithResult(actionPath, readmePath string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	doc, err := markdown.NewDoc(readmePath)
+	doc, err := markdown.NewDocOrCreate(readmePath)
 	if err != nil {
 		return false, err
 	}
