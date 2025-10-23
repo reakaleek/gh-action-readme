@@ -136,7 +136,7 @@ Create `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/reakaleek/gh-action-readme
-    rev: v0.4.1
+    rev: v0.5.0
     hooks:
       - id: action-readme
 ```
