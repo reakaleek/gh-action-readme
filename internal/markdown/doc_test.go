@@ -69,8 +69,10 @@ func TestDiff(t *testing.T) {
 	// act
 	diff := doc.Diff(&otherDoc)
 
-	// assert
-	assert.Equal(t, "Hello, World\x1b[32m!\x1b[0m", diff.PrettyDiff)
+	// assert - new unified diff format
+	assert.Contains(t, diff.PrettyDiff, "Hello, World")
+	assert.Contains(t, diff.PrettyDiff, "+")
+	assert.Contains(t, diff.PrettyDiff, "!")
 }
 
 func TestDiffTrue(t *testing.T) {

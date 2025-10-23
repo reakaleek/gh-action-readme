@@ -1,7 +1,6 @@
 package markdown
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -18,7 +17,6 @@ func table(matrix [][]string) string {
 		for j := 0; j < len(duplicate[i]); j++ {
 			duplicate[i][j] = strings.ReplaceAll(duplicate[i][j], "\n", "<br>")
 		}
-		fmt.Println()
 	}
 	colWidths := getMaxLengths(duplicate)
 	var sb strings.Builder
