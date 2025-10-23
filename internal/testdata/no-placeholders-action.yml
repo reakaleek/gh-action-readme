@@ -1,0 +1,9 @@
+name: 'Test Action'
+description: 'A test action'
+inputs:
+  input1:
+    description: 'Test input'
+    required: true
+outputs:
+  output1:
+    description: 'Test output'

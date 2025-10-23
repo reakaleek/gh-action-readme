@@ -40,6 +40,18 @@ func Test(t *testing.T) {
 			"testdata/4-README-out.md",
 			"v1.0.0",
 		},
+		{
+			"testdata/no-placeholders-action.yml",
+			"testdata/no-placeholders-README-in.md",
+			"testdata/no-placeholders-README-out.md",
+			"v1.0.0",
+		},
+		{
+			"testdata/with-placeholders-action.yml",
+			"testdata/with-placeholders-README-in.md",
+			"testdata/with-placeholders-README-out.md",
+			"v1.0.0",
+		},
 	}
 
 	for _, tt := range tests {
