@@ -86,7 +86,7 @@ gh action-readme init
 
 This creates a `README.md` file with the following template:
 
-```markdown
+````markdown
 <!-- Generated with https://github.com/reakaleek/gh-action-readme -->
 # <!--name--><!--/name-->
 <!--description-->
@@ -104,11 +104,11 @@ steps:
  - uses: org/repo@v1
 ```
 <!--/usage-->
-```
+````
 
 Let's edit the usage section to match your action. Open `README.md` and update the usage placeholder:
 
-```markdown
+````markdown
 <!--usage action="myorg/my-awesome-action" version="v1.0.0"-->
 ```yaml
 steps:
@@ -119,7 +119,7 @@ steps:
       greeting: 'Hello'
 ```
 <!--/usage-->
-```
+````
 
 ## Step 4: Generate the documentation
 
