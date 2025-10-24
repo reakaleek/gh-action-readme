@@ -1,4 +1,9 @@
 name: GitHub Action README
+
+branding:
+  icon: file-text
+  color: blue
+
 description: >-
   This action checks if the documentation is up-to-date for multiple 
   GitHub Actions in a monorepo.
