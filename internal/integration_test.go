@@ -52,6 +52,12 @@ func Test(t *testing.T) {
 			"testdata/with-placeholders-README-out.md",
 			"v1.0.0",
 		},
+		{
+			"testdata/codeblock-action.yml",
+			"testdata/codeblock-README-in.md",
+			"testdata/codeblock-README-out.md",
+			"v1.0.0",
+		},
 	}
 
 	for _, tt := range tests {
