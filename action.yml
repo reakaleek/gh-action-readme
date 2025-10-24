@@ -35,6 +35,8 @@ runs:
         else
           gh extension install reakaleek/gh-action-readme --pin "${GH_ACTIONS_README_VERSION}"
         fi
+      shell: bash
     - name: Check if the documentation is up-to-date
       run: |
         gh action-readme ${{ inputs.command }} ${{ inputs.args }}
+      shell: bash
