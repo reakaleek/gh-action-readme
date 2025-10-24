@@ -1,0 +1,40 @@
+name: GitHub Action README
+description: >-
+  This action checks if the documentation is up-to-date for multiple 
+  GitHub Actions in a monorepo.
+inputs:
+  version:
+    description: >-
+      Use a specific version of gh-action-readme (e.g. v0.5.0).
+      You can find the latest version at https://github.com/reakaleek/gh-action-readme/releases.
+    required: false
+    default: false
+  github-token:
+    description: A GitHub token with permissions to install extensions.
+    required: false
+    default: ${{ github.token }}
+  command:
+    description: The gh-action-readme command to run.
+    required: false
+    default: diff
+  args:
+    description: Arguments to pass to the command.
+    required: false
+    default: '--recursive'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install gh-action-readme extension
+      env: 
+        GH_ACTIONS_README_VERSION: ${{ inputs.version }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        if [ -z "$GH_ACTIONS_README_VERSION" ]; then
+          gh extension install reakaleek/gh-action-readme
+        else
+          gh extension install reakaleek/gh-action-readme --pin "${GH_ACTIONS_README_VERSION}"
+        fi
+    - name: Check if the documentation is up-to-date
+      run: |
+        gh action-readme ${{ inputs.command }} ${{ inputs.args }}
