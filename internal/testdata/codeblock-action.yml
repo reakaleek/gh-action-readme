@@ -1,0 +1,22 @@
+name: Code Block Test Action
+description: |
+  This action tests that placeholder tags inside code blocks are ignored.
+  It should only process the real placeholders outside code blocks.
+
+inputs:
+  real-input:
+    description: This is a real input that should be processed
+    required: true
+    default: 'default-value'
+
+outputs:
+  real-output:
+    description: This is a real output that should be processed
+    value: 'Hello, World!'
+
+runs:
+  using: composite
+  steps:
+    - name: Test Step
+      run: echo "Testing code block handling"
+      shell: bash
