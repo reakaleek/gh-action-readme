@@ -32,21 +32,41 @@ Create a `README.md` file in the action directory containing the `action.yml` fi
 You can use the following template to define the metadata placeholders.
 
 ```markdown
-# <!--name-->GitHub Action README<!--/name-->
+# <!--name--><!--/name-->
 <!--description-->
-This action checks if the documentation is up-to-date for multiple  GitHub Actions in a monorepo.
-<!--/description-->
 
 ## Inputs
 <!--inputs-->
-| Name           | Description                                                                                                                                          | Required | Default               |
-|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------|----------|-----------------------|
-| `version`      | Use a specific version of gh-action-readme (e.g. v0.5.0). You can find the latest version at https://github.com/reakaleek/gh-action-readme/releases. | `false`  | ` `                   |
-| `github-token` | A GitHub token with permissions to install extensions.                                                                                               | `false`  | `${{ github.token }}` |
-| `command`      | The gh-action-readme command to run.                                                                                                                 | `false`  | `diff`                |
-| `args`         | Arguments to pass to the command.                                                                                                                    | `false`  | `--recursive`         |
-<!--/inputs-->
 ```
+
+### Update the `README.md` file
+
+Run the following command to update the `README.md` file with the metadata from the `action.yml` file.
+
+```bash
+gh action-readme update
+```
+
+### That's it! 🎉
+
+The `README.md` file will be updated with the metadata from the `action.yml` file.
+
+```diff
+-# <!--name--><!--/name-->
++# <!--name-->Awesome Action<!--/name-->
+<!--description-->
++A GitHub Action that does something awesome.
++Something that is very useful.
++<!--/description-->
+
+## Inputs
+<!--inputs-->
++| Name   | Description     | Required | Default   |
++|--------|-----------------|----------|-----------|
++| input1 | The first input | `true`   | `default` |
++<!--/inputs-->
+```
+
 
 Checkout the documentation for more information on how to use the `gh-action-readme` extension.
 - [Getting Started](./docs/tutorials/getting-started.md) - Quick start tutorial (5 minutes)
@@ -122,23 +142,3 @@ jobs:
       - uses: reakaleek/gh-action-readme@v1
 ```               
 <!--/usage-->
-
-### GitHub Actions Monorepo Support
-
-The `action-readme` pre-commit supports monorepos with multiple actions in a single repository.
-It will automatically detect the `action.yml` files in the repository and update the corresponding `README.md` files.
-
-```
-.
-├── action-a/
-│   ├── action.yml
-│   └── README.md
-├── action-b/
-│   ├── action.yml
-│   └── README.md
-└── some/
-    └── folder/
-        └── action-c/
-            ├── action.yml
-            └── README.md
-```
