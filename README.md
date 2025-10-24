@@ -48,6 +48,7 @@ This action checks if the documentation is up-to-date for multiple  GitHub Actio
 <!--/inputs-->
 ```
 
+
 Checkout the documentation for more information on how to use the `gh-action-readme` extension.
 - [Getting Started](./docs/tutorials/getting-started.md) - Quick start tutorial (5 minutes)
 - [Building a Complete Action README](./docs/tutorials/complete-action-readme.md) - Full example with all features
@@ -122,23 +123,3 @@ jobs:
       - uses: reakaleek/gh-action-readme@v1
 ```               
 <!--/usage-->
-
-### GitHub Actions Monorepo Support
-
-The `action-readme` pre-commit supports monorepos with multiple actions in a single repository.
-It will automatically detect the `action.yml` files in the repository and update the corresponding `README.md` files.
-
-```
-.
-├── action-a/
-│   ├── action.yml
-│   └── README.md
-├── action-b/
-│   ├── action.yml
-│   └── README.md
-└── some/
-    └── folder/
-        └── action-c/
-            ├── action.yml
-            └── README.md
-```
