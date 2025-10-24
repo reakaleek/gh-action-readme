@@ -92,7 +92,7 @@ This action checks if the documentation is up-to-date for multiple  GitHub Actio
 <!--inputs-->
 | Name           | Description                                                                                                                                          | Required | Default               |
 |----------------|------------------------------------------------------------------------------------------------------------------------------------------------------|----------|-----------------------|
-| `version`      | Use a specific version of gh-action-readme (e.g. v0.5.0). You can find the latest version at https://github.com/reakaleek/gh-action-readme/releases. | `false`  | `false`               |
+| `version`      | Use a specific version of gh-action-readme (e.g. v0.5.0). You can find the latest version at https://github.com/reakaleek/gh-action-readme/releases. | `false`  | ` `                   |
 | `github-token` | A GitHub token with permissions to install extensions.                                                                                               | `false`  | `${{ github.token }}` |
 | `command`      | The gh-action-readme command to run.                                                                                                                 | `false`  | `diff`                |
 | `args`         | Arguments to pass to the command.                                                                                                                    | `false`  | `--recursive`         |
