@@ -1,0 +1,17 @@
+name: integration-test
+
+on:
+  pull_request:
+
+jobs:
+  gh-action-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: .
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v5
+        - uses: actions/setup-python@v6
+        - uses: pre-commit/action@v3.0.1

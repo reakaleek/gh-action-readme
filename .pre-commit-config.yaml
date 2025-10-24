@@ -1,0 +1,6 @@
+repos:
+  - repo: https://github.com/reakaleek/gh-action-readme
+    rev: v0.6.0
+    hooks:
+      - id: action-readme
+        verbose: true
