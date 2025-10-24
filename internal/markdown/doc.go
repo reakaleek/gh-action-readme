@@ -215,7 +215,7 @@ func readFile(name string) (string, error) {
 func (d *Doc) findIndex(pattern string) int {
 	r := regexp.MustCompile(pattern)
 	for i, line := range d.lines {
-		if r.MatchString(line) {
+		if r.MatchString(line) && !d.IsInsideCodeBlock(i) {
 			return i
 		}
 	}
@@ -226,7 +226,7 @@ func (d *Doc) findAllIndices(pattern string) []int {
 	r := regexp.MustCompile(pattern)
 	indices := []int{}
 	for i, line := range d.lines {
-		if r.MatchString(line) {
+		if r.MatchString(line) && !d.IsInsideCodeBlock(i) {
 			indices = append(indices, i)
 		}
 	}
@@ -473,4 +473,19 @@ func getAttribute(line string, attribute string) (string, error) {
 
 func (d *Doc) Equals(doc Doc) bool {
 	return d.ToString() == doc.ToString()
+}
+
+// IsInsideCodeBlock checks if the line at the given index is inside a markdown code block
+func (d *Doc) IsInsideCodeBlock(lineIndex int) bool {
+	// Match any number of backticks (3 or more) at the start of a line, optionally followed by a language identifier
+	codeBlockRegex := regexp.MustCompile("^`{3,}")
+	inCodeBlock := false
+	
+	for i := 0; i <= lineIndex; i++ {
+		if i < len(d.lines) && codeBlockRegex.MatchString(d.lines[i]) {
+			inCodeBlock = !inCodeBlock
+		}
+	}
+	
+	return inCodeBlock
 }
