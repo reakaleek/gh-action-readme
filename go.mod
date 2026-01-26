@@ -3,7 +3,7 @@ module github.com/reakaleek/gh-action-readme
 go 1.24.9
 
 require (
-	github.com/bmatcuk/doublestar/v4 v4.9.1
+	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/fatih/color v1.18.0
 	github.com/sergi/go-diff v1.4.0
 	github.com/stretchr/testify v1.11.1
