@@ -47,9 +47,21 @@ func NewCommand() *cli.Command {
 					continue
 				}
 				doc, err := markdown.NewDoc(readmePath)
-				oldDoc := doc.Copy()
+				var oldDoc markdown.Doc
 				if err != nil {
-					return err
+					if !errors.Is(err, os.ErrNotExist) {
+						return err
+					}
+					// README.md doesn't exist yet — use an empty doc as the "before"
+					// state so any generated content counts as a change.
+					emptyDoc := markdown.NewEmptyDoc(readmePath)
+					oldDoc = emptyDoc.Copy()
+					doc, err = markdown.NewDocOrCreate(readmePath)
+					if err != nil {
+						return err
+					}
+				} else {
+					oldDoc = doc.Copy()
 				}
 				parser := action.NewParser()
 				a, err := parser.Parse(actionPath)
