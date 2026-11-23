@@ -5,7 +5,7 @@ go 1.24.9
 require (
 	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/fatih/color v1.18.0
-	github.com/sergi/go-diff v1.4.0
+	github.com/sergi/go-diff v1.4.5
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v2 v2.27.7
 	gopkg.in/yaml.v3 v3.0.1
